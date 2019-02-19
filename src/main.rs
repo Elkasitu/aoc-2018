@@ -8,7 +8,8 @@ fn main() {
     let mut f = File::open("src/input.txt").unwrap();
     f.read_to_string(&mut input);
     let coords: Vec<&str> = input.trim().split('\n').collect();
-    println!("Day 1 part 1 solution: {}", day_1_part_1(coords));
+    println!("Part 1 solution: {}", part_1(coords.clone()));
+    println!("Part 2 solution: {}", part_2(coords));
 }
 
 struct Plot {
@@ -72,7 +73,31 @@ fn get_overlapping_sqm(overlaps: HashMap<(i32, i32), i32>, n: i32) -> i32 {
     return i;
 }
 
-fn day_1_part_1(coords: Vec<&str>) -> i32 {
+fn part_1(coords: Vec<&str>) -> i32 {
     let overlaps = get_overlaps(parse_coords(coords));
     return get_overlapping_sqm(overlaps, 2);
+}
+
+fn get_perfect_plot(plots: Vec<Plot>, overlaps: HashMap<(i32, i32), i32>) -> i32 {
+    for plot in plots {
+        let points = plot.get_plot_coords();
+        let mut found = true;
+        for point in points {
+            if *overlaps.get(&point).unwrap() > 1 {
+                found = false;
+                break;
+            }
+        }
+        if found {
+            return plot.id;
+        }
+    }
+    return -1;
+}
+
+fn part_2(coords: Vec<&str>) -> i32 {
+    let plots: Vec<Plot> = parse_coords(coords.clone());
+    let plots2: Vec<Plot> = parse_coords(coords);
+    let overlaps = get_overlaps(plots);
+    return get_perfect_plot(plots2, overlaps);
 }
